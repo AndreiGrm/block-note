@@ -1,15 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   template: `
-    <h1>Welcome to {{title}}!</h1>
     <router-outlet />
   `,
   styles: [],
 })
-export class App {
+export class App implements OnInit {
   protected title = 'block-note';
+  ngOnInit(): void {
+    let notesJson = localStorage.getItem('notes');
+
+    if (notesJson === null || notesJson === undefined || notesJson === 'undefined') {
+      
+      localStorage.setItem('notes', '[]')
+    }
+    
+  }
 }

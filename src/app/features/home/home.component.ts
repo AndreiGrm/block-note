@@ -1,0 +1,50 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { NoteList } from '../note-list/note-list.component';
+import { Note } from '../note.component';
+import { NotesService } from '../../services/notes.service';
+
+@Component({
+  selector: 'app-home',
+  imports: [NoteList, Note],
+  template: `
+  <div class="layout">
+    <aside class="sidebar">
+      <app-note-list></app-note-list>
+    </aside>
+    <main class="content">
+      <app-note [noteSelected]="notesService.selected()"></app-note>
+    </main>
+  </div>
+  `,
+  styles: `
+      .layout {
+      display: flex;
+      height: 100vh;
+    }
+  
+    .sidebar {
+      width: 350px;
+      background-color: #181818;
+      padding: 1rem;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+    }
+
+    .main {
+      background-color: #1f1f1f;
+    }
+  
+    .content {
+      flex: 1;
+      color: white;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    `
+})
+export default class Home implements OnInit {
+   notesService = inject(NotesService)
+   ngOnInit(): void {
+     this.notesService.viewNote(null)
+   }
+}

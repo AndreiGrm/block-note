@@ -5,47 +5,48 @@ import { Note } from '../model/note';
   providedIn: 'root'
 })
 export class NotesService {
-  notes = signal<Note[]>([])
+  notes = signal<Note[]>([]);
 
-  selectedNote = signal<Number | undefined>(undefined)
+  selectedNote = signal<number | undefined>(undefined);
 
-  selected = computed(() => this.notes().find((n) => {
-    if (this.selectedNote) {
-      return n.id === this.selectedNote()
-    }
-    return undefined
-  }))
+  selected = computed(() => {
+    const id = this.selectedNote();
+    if (id === undefined) return undefined;
+    return this.notes().find(n => n.id === id);
+  });
 
   load() {
-    let storageNotes = localStorage.getItem('notes') || '[]'
+    let notesJson = localStorage.getItem('notes');
 
-    let notesParsed: Note[] = JSON.parse(storageNotes)
+    if (!notesJson || notesJson === 'undefined') {
+      localStorage.setItem('notes', '[]');
+      this.addNotes();
+      return;
+    }
+
+    const notesParsed: Note[] = JSON.parse(notesJson);
 
     if (Array.isArray(notesParsed)) {
-      this.notes.set(notesParsed)
-    } else {
-      this.notes.set([])
+      this.notes.set(notesParsed);
     }
-    
+    this.selectNote(null);
   }
 
-  viewNote (id: number | null) {
-    if (id) {
-      this.selectedNote.set(id)
+  selectNote(id: number | null) {
+    if (id !== null && id !== undefined) {
+      this.selectedNote.set(id);
       localStorage.setItem('selected-note', id.toString());
     } else {
-      let lastSelected = localStorage.getItem('selected-not')
+      const lastSelected = localStorage.getItem('selected-note');
       if (lastSelected) {
-        this.selectedNote.set(Number(lastSelected))
-        localStorage.setItem('selected-note', lastSelected);
+        this.selectedNote.set(Number(lastSelected));
       }
     }
-    
   }
 
-  addNotes () {
-    let now = new Date()
-    let newNote: Note = {
+  addNotes() {
+    const now = new Date();
+    const newNote: Note = {
       id: now.getTime(),
       title: 'New note',
       content: 'Write...',
@@ -53,16 +54,33 @@ export class NotesService {
       creationDate: now,
       isLocked: false,
       passward: ''
-    }
+    };
 
-    this.notes.update(notes => [...notes, newNote])
-    
+    this.notes.update(notes => [...notes, newNote]);
+    localStorage.setItem('notes', JSON.stringify(this.notes()));
+    this.selectNote(newNote.id);
+  }
+
+  updateNote<K extends keyof Note>(prop: K, value: Note[K]) {
+    const selectedNote = this.selected();
+    if (!selectedNote) return;
+
+    const updatedNote: Note = {
+      ...selectedNote,
+      [prop]: value,
+      lastModified: new Date()
+    };
+
+    this.notes.update(notes =>
+      notes.map(note => note.id === updatedNote.id ? updatedNote : note)
+    );
+
     localStorage.setItem('notes', JSON.stringify(this.notes()));
   }
 
   deleteNote(event: MouseEvent, noteToRemove: Note) {
     event.stopPropagation();
-    this.notes.update(notes => notes.filter(note => note.id !== noteToRemove.id))
+    this.notes.update(notes => notes.filter(note => note.id !== noteToRemove.id));
     localStorage.setItem('notes', JSON.stringify(this.notes()));
   }
 }

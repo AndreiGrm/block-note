@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -9,15 +9,6 @@ import { RouterOutlet } from '@angular/router';
   `,
   styles: [],
 })
-export class App implements OnInit {
+export class App {
   protected title = 'block-note';
-  ngOnInit(): void {
-    let notesJson = localStorage.getItem('notes');
-
-    if (notesJson === null || notesJson === undefined || notesJson === 'undefined') {
-      
-      localStorage.setItem('notes', '[]')
-    }
-    
-  }
 }

@@ -38,7 +38,7 @@ import { DatePipe } from '@angular/common';
         @for (note of notesService.notes(); track note.id) {
           <div class="mb-6">
             <p-card
-              (click)="notesService.viewNote(note.id)"
+              (click)="notesService.selectNote(note.id)"
               [style]="{ 'background-color': '#121212', 'color': '#ffffff' }">
               <div class="flex">
                   <p class="m-0 flex-5">

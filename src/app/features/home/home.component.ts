@@ -1,7 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NoteList } from '../note-list/note-list.component';
 import { Note } from '../note.component';
-import { NotesService } from '../../services/notes.service';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +11,7 @@ import { NotesService } from '../../services/notes.service';
       <app-note-list></app-note-list>
     </aside>
     <main class="content">
-      <app-note [noteSelected]="notesService.selected()"></app-note>
+      <app-note></app-note>
     </main>
   </div>
   `,
@@ -42,9 +41,7 @@ import { NotesService } from '../../services/notes.service';
     }
     `
 })
-export default class Home implements OnInit {
-   notesService = inject(NotesService)
-   ngOnInit(): void {
-     this.notesService.viewNote(null)
-   }
+export default class Home {
+   
+   
 }

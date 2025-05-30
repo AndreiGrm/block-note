@@ -18,7 +18,7 @@ export class NotesService {
   load() {
     let notesJson = localStorage.getItem('notes');
 
-    if (!notesJson || notesJson === 'undefined') {
+    if (!notesJson) {
       localStorage.setItem('notes', '[]');
       this.addNotes();
       return;
@@ -33,14 +33,15 @@ export class NotesService {
   }
 
   selectNote(id: number | null) {
-    if (id !== null && id !== undefined) {
-      this.selectedNote.set(id);
-      localStorage.setItem('selected-note', id.toString());
-    } else {
+    if (!id) {
       const lastSelected = localStorage.getItem('selected-note');
       if (lastSelected) {
-        this.selectedNote.set(Number(lastSelected));
+        this.selectedNote.set(Number(lastSelected))
+        localStorage.setItem('selected-note', lastSelected);
       }
+    } else {
+      this.selectedNote.set(id)
+      localStorage.setItem('selected-note', id.toString());
     }
   }
 
@@ -82,5 +83,9 @@ export class NotesService {
     event.stopPropagation();
     this.notes.update(notes => notes.filter(note => note.id !== noteToRemove.id));
     localStorage.setItem('notes', JSON.stringify(this.notes()));
+  }
+
+  lockNote(note: Note) {
+    console.log('lock');
   }
 }

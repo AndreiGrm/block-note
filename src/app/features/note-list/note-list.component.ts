@@ -57,6 +57,7 @@ import { DatePipe } from '@angular/common';
                     </button>
                     <button
                       class="p-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                      (click)="notesService.lockNote(note)"
                       title="Blocca/Sblocca"
                     >
                       Lock
@@ -67,8 +68,6 @@ import { DatePipe } from '@angular/common';
             </p-card>
           </div>
         }
-
-
   `,
   styles: `
 

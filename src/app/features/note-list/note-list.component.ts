@@ -1,14 +1,15 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { SidebarModule } from 'primeng/sidebar';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
-import { MenuItem } from 'primeng/api';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
 import { NotesService } from '../../services/notes.service';
 import { DatePipe } from '@angular/common';
+import { LockDialog } from '../lock-dialog.component';
+import { DeleteConfirmation } from "../delete-confirmation.component";
+
 
 
 @Component({
@@ -20,8 +21,10 @@ import { DatePipe } from '@angular/common';
     ButtonModule,
     PanelMenuModule,
     InputTextModule,
-    DatePipe
-  ],
+    DatePipe,
+    LockDialog,
+    DeleteConfirmation
+],
   template: `
         <div class="w-full mb-6">
           <p-button (click)="notesService.addNotes()" fluid>+ Add note</p-button>
@@ -30,16 +33,21 @@ import { DatePipe } from '@angular/common';
           <input
             type="text"
             pInputText
-            placeholder="Small"
+            placeholder="Search..."
             fluid
             variant="filled"
+            (keyup)="notesService.search($event.target)"
             pSize="large"/>
         </div>
         @for (note of notesService.notes(); track note.id) {
           <div class="mb-6">
             <p-card
               (click)="notesService.selectNote(note.id)"
-              [style]="{ 'background-color': '#121212', 'color': '#ffffff' }">
+              [style]="{
+                'background-color': '#121212',
+                'color': '#ffffff',
+                'border' : notesService.selected()?.id === note.id ? 'solid 1px #34d399' : ''
+                }">
               <div class="flex">
                   <p class="m-0 flex-5">
                       {{ note.title}} <br>
@@ -47,27 +55,29 @@ import { DatePipe } from '@angular/common';
                   </p>
   
                   <div class="flex-1 flex flex-col">
-                    <button
-                      class="p-1 text-white bg-red-600 rounded hover:bg-red-700"
-                      (click)="notesService.deleteNote($event, note)"
-                      title="Elimina"
-                    >
-                    Del
-                      <i class="pi pi-trash"></i>
-                    </button>
-                    <button
-                      class="p-1 text-white bg-blue-600 rounded hover:bg-blue-700"
-                      (click)="notesService.lockNote(note)"
+                    @if (!note.isLocked) {
+                      <p-button
+                        severity="danger"
+                        (click)="deleteDialog = true"
+                        title="Elimina"
+                      >
+                        Delete
+                      </p-button>
+                    }
+                    <p-button
+                      severity="info"
+                      (click)="visible = true"
                       title="Blocca/Sblocca"
                     >
-                      Lock
-                      <i class="pi" ></i>
-                    </button>
+                      Manage
+                    </p-button>
                   </div>
                 </div>
             </p-card>
           </div>
         }
+        <app-lock-dialog [(visible)]="visible" [locked]="notesService.selected()?.isLocked"/>
+        <app-delete-confirmation [(visible)]="deleteDialog" />
   `,
   styles: `
 
@@ -75,11 +85,9 @@ import { DatePipe } from '@angular/common';
 })
 export class NoteList implements OnInit {
   visible: boolean = false;
+  deleteDialog: boolean = false;
   notesService = inject(NotesService)
   ngOnInit(): void {
      this.notesService.load()
-  }
-  logout() {
-    console.log('Logout');
   }
 }

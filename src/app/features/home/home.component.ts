@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NoteList } from '../note-list/note-list.component';
-import { Note } from '../note.component';
+import { Note } from '../note-list/note.component';
 
 @Component({
   selector: 'app-home',

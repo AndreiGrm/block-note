@@ -1,48 +1,35 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Note } from '../model/note';
-
+import { LocalestorageService } from './localestorage.service';
 @Injectable({
   providedIn: 'root'
 })
 export class NotesService {
   notes = signal<Note[]>([]);
+  
 
-  selectedNote = signal<number | undefined>(undefined);
+  localstorage = inject(LocalestorageService)
 
-  selected = computed(() => {
-    const id = this.selectedNote();
-    if (id === undefined) return undefined;
-    return this.notes().find(n => n.id === id);
-  });
+  selected = signal<Note | undefined>(undefined);
 
   load() {
-    let notesJson = localStorage.getItem('notes');
+    let notes: Note[] = this.localstorage.load('notes').data;
 
-    if (!notesJson) {
-      localStorage.setItem('notes', '[]');
-      this.addNotes();
-      return;
-    }
-
-    const notesParsed: Note[] = JSON.parse(notesJson);
-
-    if (Array.isArray(notesParsed)) {
-      this.notes.set(notesParsed);
+    if (Array.isArray(notes)) {
+      this.notes.set(notes);
+      
+      if (!this.notes().length) {
+        this.addNotes()
+      }
     }
     this.selectNote(null);
   }
 
   selectNote(id: number | null) {
-    if (!id) {
-      const lastSelected = localStorage.getItem('selected-note');
-      if (lastSelected) {
-        this.selectedNote.set(Number(lastSelected))
-        localStorage.setItem('selected-note', lastSelected);
-      }
-    } else {
-      this.selectedNote.set(id)
-      localStorage.setItem('selected-note', id.toString());
+    if (this.selected()?.isLocked) {
+      this.updateNote('canSee', false, true)
     }
+    this.selected.set(this.localstorage.getById('notes', 'selected-note', id).data)
   }
 
   addNotes() {
@@ -54,38 +41,54 @@ export class NotesService {
       lastModified: now,
       creationDate: now,
       isLocked: false,
-      passward: ''
+      canSee: true,
+      passward: undefined
     };
 
-    this.notes.update(notes => [...notes, newNote]);
-    localStorage.setItem('notes', JSON.stringify(this.notes()));
-    this.selectNote(newNote.id);
+    const newValue = this.localstorage.save('notes', newNote).data
+    if (newValue) {
+      this.notes.update(notes => [...notes, newValue]);
+      this.selectNote(newValue.id);
+    }
+
   }
 
-  updateNote<K extends keyof Note>(prop: K, value: Note[K]) {
+  search (element: any) {
+    const filteredNotes = this.localstorage.getBy('notes', 'title', element.value).data
+    this.notes.set(filteredNotes)
+  }
+
+  updateNote<K extends keyof Note>(prop: K, value: Note[K], silentUpdate: boolean = false) {
     const selectedNote = this.selected();
     if (!selectedNote) return;
-
     const updatedNote: Note = {
       ...selectedNote,
       [prop]: value,
       lastModified: new Date()
     };
 
+    const newValue = this.localstorage.update('notes', updatedNote, silentUpdate).data
+
+ 
     this.notes.update(notes =>
-      notes.map(note => note.id === updatedNote.id ? updatedNote : note)
+      notes.map(note => note.id === newValue.id ? newValue : note)
     );
-
-    localStorage.setItem('notes', JSON.stringify(this.notes()));
+    this.selected.set(newValue)
   }
 
-  deleteNote(event: MouseEvent, noteToRemove: Note) {
-    event.stopPropagation();
+  updateAllNote (note: Note) {
+    const newValue = this.localstorage.update('notes', note).data
+
+    this.notes.update(notes =>
+      notes.map(note => note.id === newValue.id ? newValue : note)
+    );
+    this.selected.set(newValue)
+  }
+
+  deleteNote(noteToRemove: Note) {
+    this.localstorage.delete('notes', noteToRemove.id)
     this.notes.update(notes => notes.filter(note => note.id !== noteToRemove.id));
-    localStorage.setItem('notes', JSON.stringify(this.notes()));
+    this.selectNote(null);
   }
 
-  lockNote(note: Note) {
-    console.log('lock');
-  }
 }

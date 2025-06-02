@@ -5,5 +5,6 @@ export interface Note {
   creationDate: Date;
   lastModified: Date;
   isLocked: boolean;
-  passward: string;
+  canSee: boolean
+  passward: number | undefined;
 }

@@ -50,7 +50,7 @@ export class LockDialog {
     this.visibleChange.emit(!this.visible);
   }
 
-  lockEvent (event: string) {
+  lockEvent (event: 'lock' | 'unlock' | 'show' | 'delete') {
     let newNote
     const selected = this.notesService.selected();
     switch (event) {

@@ -93,10 +93,10 @@ export class LockDialog {
       default:
         break;
     }
-    this.pin = undefined
     if (this.haveAuth()) {
       this.toggleDialog()
     }
+    this.pin = undefined
   }
 
   haveAuth () {

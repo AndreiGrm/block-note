@@ -35,7 +35,7 @@ export class NotesService {
 
   selectNote(id: number | null) {
     if (this.selected()?.isLocked) {
-      this.updateNote('canSee', false, true)
+      this.updateNote({canSee: false}, true)
     }
     this.selected.set(this.localstorage.getById('notes', 'selected-note', id).data)
   }
@@ -65,12 +65,12 @@ export class NotesService {
     this.notes.set(filteredNotes)
   }
 
-  updateNote<K extends keyof Note>(prop: K, value: Note[K], silentUpdate: boolean = false) {
+  updateNote(value: Partial<Note>, silentUpdate: boolean = false) {
     const selectedNote = this.selected();
     if (!selectedNote) return;
     const updatedNote: Note = {
       ...selectedNote,
-      [prop]: value,
+      ...value,
       lastModified: new Date()
     };
 

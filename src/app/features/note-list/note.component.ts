@@ -70,13 +70,13 @@ export class Note {
 
   onBlurTitle() {
     if (this.selectedNote()) {
-      this.notesService.updateNote('title', this.title, true);
+      this.notesService.updateNote({title: this.title}, true);
     }
   }
 
   onBlurContent() {
     if (this.selectedNote()) {
-      this.notesService.updateNote('content', this.content, true);
+      this.notesService.updateNote({content: this.content}, true);
     }
   }
 }

@@ -15,7 +15,13 @@ export class NotesService {
   updateStatus = signal<'none' | 'loading' | 'saved' | 'error'>('none');
 
   load() {
-    let notes: Note[] = this.localstorage.load('notes').data;
+    const response = this.localstorage.load('notes')
+    if (response.status !== 200) {
+      this.notes.set([]);
+      return;
+    }
+    
+    let notes: Note[] = response.data;
 
     if (Array.isArray(notes)) {
       this.notes.set(notes);

@@ -22,10 +22,10 @@ export class LocalestorageService {
         data: notesParsed
       }
     } catch (error) {
-      console.error("Error:", error);
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error while loading record' });
       return {
         status: 404,
-        data: null
+        data: []
       }
     }
     

@@ -35,9 +35,29 @@ export class NotesService {
 
   selectNote(id: number | null) {
     if (this.selected()?.isLocked) {
-      this.updateNote({canSee: false}, true)
+       this.ghostUpdate({canSee: false})
     }
     this.selected.set(this.localstorage.getById('notes', 'selected-note', id).data)
+  }
+
+  ghostUpdate(value: Partial<Note>) {
+    const selectedNote = this.selected();
+    if (!selectedNote) return;
+    const updatedNote: Note = {
+      ...selectedNote,
+      ...value,
+    };
+    const response = this.localstorage.update('notes', updatedNote, true)
+    if (response.status !== 200) {
+      return;
+    }
+
+    const newValue = response.data
+    
+    this.notes.update(notes =>
+      notes.map(note => note.id === newValue.id ? newValue : note)
+    );
+    this.selected.set(newValue)
   }
 
   addNotes() {

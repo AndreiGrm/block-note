@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, input, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, Input, model, Output } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
@@ -17,7 +17,7 @@ import { NotesService } from '../services/notes.service';
     FormsModule
   ],
   template: `
-    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }" (onHide)="onDialogHide()">
+    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }" >
       <span class="p-text-secondary block mb-8">Insert pin.</span>
       
       <div class="flex items-center gap-4 mb-4">
@@ -42,12 +42,13 @@ import { NotesService } from '../services/notes.service';
 export class LockDialog {
   notesService = inject(NotesService);
   pin: number | undefined
-  @Input() locked: boolean | undefined = false;
-  @Input() visible: boolean = false;
-  @Output() visibleChange = new EventEmitter<boolean>();
+
+
+  visible = model<boolean>(false);
+
 
   toggleDialog () {
-    this.visibleChange.emit(!this.visible);
+    this.visible.set(!this.visible());
   }
 
   lockEvent (event: 'lock' | 'unlock' | 'show' | 'delete') {
@@ -103,7 +104,4 @@ export class LockDialog {
     return this.pin === this.notesService.selected()?.passward
   }
 
-  onDialogHide () {
-    this.visibleChange.emit(false);
-  }
 }

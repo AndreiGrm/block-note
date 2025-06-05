@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, input, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, Input, model, Output } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
@@ -17,7 +17,7 @@ import { NotesService } from '../services/notes.service';
     FormsModule
   ],
   template: `
-    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }" (onHide)="onDialogHide()">
+    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
       <span class="p-text-secondary block mb-8">Confirm deletion.</span>
       
       
@@ -32,14 +32,10 @@ import { NotesService } from '../services/notes.service';
 })
 export class DeleteConfirmation {
   notesService = inject(NotesService);
-  @Input() visible: boolean = false;
-  @Output() visibleChange = new EventEmitter<boolean>();
+  visible = model<boolean>(false);
 
   toggleDialog () {
-    this.visibleChange.emit(!this.visible);
-  }
-  onDialogHide () {
-    this.visibleChange.emit(false);
+    this.visible.set(!this.visible());
   }
 
   onDelete () {

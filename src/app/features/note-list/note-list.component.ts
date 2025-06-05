@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { SidebarModule } from 'primeng/sidebar';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
@@ -76,7 +76,7 @@ import { DeleteConfirmation } from "../delete-confirmation.component";
             </p-card>
           </div>
         }
-        <app-lock-dialog [(visible)]="visible" [locked]="notesService.selected()?.isLocked"/>
+        <app-lock-dialog [(visible)]="visible" />
         <app-delete-confirmation [(visible)]="deleteDialog" />
   `,
   styles: `

@@ -3,7 +3,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog'; // corretto: "DialogModule" e non "Dialog"
+import { DialogModule } from 'primeng/dialog';
 import { NotesService } from '../services/notes.service';
 
 @Component({
@@ -39,7 +39,7 @@ export class DeleteConfirmation {
     this.visibleChange.emit(!this.visible);
   }
   onDialogHide () {
-    this.visibleChange.emit(false); // Se chiuso con ESC o clic fuori
+    this.visibleChange.emit(false);
   }
 
   onDelete () {

@@ -12,6 +12,8 @@ export class NotesService {
 
   selected = signal<Note | undefined>(undefined);
 
+  updateStatus = signal<'none' | 'loading' | 'saved' | 'error'>('none');
+
   load() {
     let notes: Note[] = this.localstorage.load('notes').data;
 
@@ -50,7 +52,6 @@ export class NotesService {
       this.notes.update(notes => [...notes, newValue]);
       this.selectNote(newValue.id);
     }
-
   }
 
   search (element: any) {
@@ -67,13 +68,25 @@ export class NotesService {
       lastModified: new Date()
     };
 
-    const newValue = this.localstorage.update('notes', updatedNote, silentUpdate).data
+    // this is just for fake the time to update 
+    this.updateStatus.set('loading');
+    setTimeout(() => {
+      const response = this.localstorage.update('notes', updatedNote, silentUpdate)
+      if (response.status !== 200) {
+        this.updateStatus.set('error');
+        return;
+      }
+      this.updateStatus.set('saved');
+  
+      const newValue = response.data
+      
+      this.notes.update(notes =>
+        notes.map(note => note.id === newValue.id ? newValue : note)
+      );
+      this.selected.set(newValue)
+    }, 1000);
 
- 
-    this.notes.update(notes =>
-      notes.map(note => note.id === newValue.id ? newValue : note)
-    );
-    this.selected.set(newValue)
+
   }
 
   updateAllNote (note: Note) {

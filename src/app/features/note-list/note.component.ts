@@ -10,13 +10,27 @@ import { TextareaModule } from 'primeng/textarea';
   imports: [
     InputTextModule,
     TextareaModule,
-    FormsModule,
+    FormsModule
   ],
   template: `
     @if(notesService.selected()?.canSee) {
       <div style="color: white;" class="flex flex-col gap-4">
-        <div>Selezionata: {{ selectedNote()?.title || 'Nessuna nota selezionata' }}</div>
-  
+        <div class="flex justify-between">
+          <div>Selezionata: {{ selectedNote()?.title }}</div>
+          @switch (notesService.updateStatus()) {
+            @case('loading') {
+              <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            }
+            @case('saved') {
+              <i class="pi pi-check" style="font-size: 2rem; color: green"></i>
+            }
+            @case('error') {
+              <i class="pi pi-times" style="font-size: 2rem; color: red"></i>
+            }
+            @case('none') {
+            }
+          }
+        </div>
         <input
           type="text"
           pInputText
@@ -56,13 +70,13 @@ export class Note {
 
   onBlurTitle() {
     if (this.selectedNote()) {
-      this.notesService.updateNote('title', this.title);
+      this.notesService.updateNote('title', this.title, true);
     }
   }
 
   onBlurContent() {
     if (this.selectedNote()) {
-      this.notesService.updateNote('content', this.content);
+      this.notesService.updateNote('content', this.content, true);
     }
   }
 }

@@ -13,7 +13,12 @@ import { TextareaModule } from 'primeng/textarea';
     FormsModule
   ],
   template: `
-    @if(notesService.selected()?.canSee) {
+    @if (!notesService.selected()) {
+      <div class="flex justify-center items-center h-full">
+        <div class="text-2xl text-gray-500">No note selected</div>
+      </div>
+    }
+    @else if (notesService.selected()?.canSee) {
       <div style="color: white;" class="flex flex-col gap-4">
         <div class="flex justify-between">
           <div>Selezionata: {{ selectedNote()?.title }}</div>

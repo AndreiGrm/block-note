@@ -21,7 +21,7 @@ import { NotesService } from '../services/notes.service';
     @else if (notesService.selected()?.canSee) {
       <div style="color: white;" class="flex flex-col gap-4">
         <div class="flex justify-between">
-          <div>Selezionata: {{ selectedNote()?.title }}</div>
+          <div>Selected:</div>
           @switch (notesService.updateStatus()) {
             @case('loading') {
               <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>

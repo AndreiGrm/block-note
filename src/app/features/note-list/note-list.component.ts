@@ -49,7 +49,7 @@ import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.compon
                 'color': '#ffffff',
                 'border' : notesService.selected()?.id === note.id ? 'solid 1px #34d399' : ''
                 }">
-              <div class="flex">
+              <div class="flex items-center">
                   <div class="m-0 flex-5 truncate">
                       <p class="truncate">
                       {{ note.title}}
@@ -57,7 +57,7 @@ import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.compon
                       <span class="text-gray-500 italic" >{{ note.lastModified | date: 'dd/MM/yy HH:mm' }}</span>
                   </div>
   
-                  <div class="flex-1 flex flex-col">
+                  <div class="flex-1 flex gap-1 ">
                     @if (!note.isLocked) {
                       <p-button
                         severity="danger"

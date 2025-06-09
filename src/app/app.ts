@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 
@@ -14,4 +14,13 @@ import { ToastModule } from 'primeng/toast';
 })
 export class App {
   protected title = 'block-note';
+
+   @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKey(event: Event) {
+    if (event instanceof KeyboardEvent) {
+          console.log('ESC premuto!');
+    }
+
+    // es: this.dialogService.closeAll();
+  }
 }

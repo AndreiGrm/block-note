@@ -8,7 +8,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { NotesService } from '../../services/notes.service';
 import { DatePipe } from '@angular/common';
 import { LockDialog } from '../lock-dialog.component';
-import { DeleteConfirmation } from "../delete-confirmation.component";
+import { DeleteConfirmation } from '../../ui/delete-confirmation.component';
+
 
 
 
@@ -49,10 +50,11 @@ import { DeleteConfirmation } from "../delete-confirmation.component";
                 'border' : notesService.selected()?.id === note.id ? 'solid 1px #34d399' : ''
                 }">
               <div class="flex">
-                  <p class="m-0 flex-5">
+                  <div class="m-0 flex-5">
+                      <p>
                       {{ note.title}} <br>
-                      {{ note.lastModified | date: 'dd/MM/yy HH:mm' }}
-                  </p>
+                      <span class="text-gray-500 italic" >{{ note.lastModified | date: 'dd/MM/yy HH:mm' }}</span>
+                  </div>
   
                   <div class="flex-1 flex flex-col">
                     @if (!note.isLocked) {
@@ -61,7 +63,7 @@ import { DeleteConfirmation } from "../delete-confirmation.component";
                         (click)="deleteDialog = true"
                         title="Elimina"
                       >
-                        Delete
+                        <i class="pi pi-trash" title="Elimina"></i>
                       </p-button>
                     }
                     <p-button
@@ -69,7 +71,7 @@ import { DeleteConfirmation } from "../delete-confirmation.component";
                       (click)="visible = true"
                       title="Blocca/Sblocca"
                     >
-                      Manage
+                      <i class="pi pi-cog" ></i>
                     </p-button>
                   </div>
                 </div>

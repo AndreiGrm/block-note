@@ -1,8 +1,8 @@
 import { Component, computed, effect, inject } from '@angular/core';
-import { NotesService } from '../../services/notes.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
+import { NotesService } from '../services/notes.service';
 
 @Component({
   selector: 'app-note',
@@ -36,20 +36,29 @@ import { TextareaModule } from 'primeng/textarea';
             }
           }
         </div>
+        <div class="flex justify-between items-center">
+          <strong>Title:</strong>
+          <span class="text-gray-500">{{ title.length }}/64 characters</span>
+        </div>
         <input
           type="text"
           pInputText
           [(ngModel)]="title"
           (blur)="onBlurTitle()"
+          maxlength="64"
         />
-  
-        <textarea
-          rows="5"
-          cols="30"
-          pTextarea
-          [(ngModel)]="content"
-          (blur)="onBlurContent()"
-        ></textarea>
+        <div class="flex flex-col">
+          <strong>Content:</strong>
+          <textarea
+            rows="5"
+            cols="30"
+            pTextarea
+            [(ngModel)]="content"
+            (blur)="onBlurContent()"
+            maxlength="2000"
+          ></textarea>
+          <span class="text-gray-500 self-end-safe">{{ content.length }}/2000 characters</span>
+        </div>
       </div>
     } @else {
       <div>Note is locked</div>
@@ -75,6 +84,9 @@ export class Note {
 
   onBlurTitle() {
     if (this.selectedNote()) {
+      if (this.title.length > 5) {
+        console.log('nop');
+      }
       this.notesService.updateNote({title: this.title}, true);
     }
   }

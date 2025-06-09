@@ -30,7 +30,7 @@ import { NotesService } from '../services/notes.service';
   `,
   styles: []
 })
-export class DeleteConfirmation {
+export class DeleteConfirmationComponent {
   notesService = inject(NotesService);
   visible = model<boolean>(false);
 

@@ -39,7 +39,7 @@ import { NotesService } from '../services/notes.service';
   `,
   styles: []
 })
-export class LockDialog {
+export class LockDialogComponent {
   notesService = inject(NotesService);
   pin: number | undefined
 

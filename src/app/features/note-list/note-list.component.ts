@@ -7,8 +7,8 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { NotesService } from '../../services/notes.service';
 import { DatePipe } from '@angular/common';
-import { LockDialog } from '../lock-dialog.component';
-import { DeleteConfirmation } from '../../ui/delete-confirmation.component';
+import { LockDialogComponent } from '../lock-dialog.component';
+import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.component';
 
 
 
@@ -23,8 +23,8 @@ import { DeleteConfirmation } from '../../ui/delete-confirmation.component';
     PanelMenuModule,
     InputTextModule,
     DatePipe,
-    LockDialog,
-    DeleteConfirmation
+    LockDialogComponent,
+    DeleteConfirmationComponent
 ],
   template: `
         <div class="w-full mb-6">

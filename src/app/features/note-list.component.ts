@@ -1,15 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { NoDataFoundComponent } from '../ui/no-data-found.component';
+import { DeleteConfirmationComponent } from '../ui/delete-confirmation.component';
+import { LockDialogComponent } from './lock-dialog.component';
 import { SidebarModule } from 'primeng/sidebar';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-import { NotesService } from '../../services/notes.service';
+import { NotesService } from '../services/notes.service';
 import { DatePipe } from '@angular/common';
-import { LockDialogComponent } from '../lock-dialog.component';
-import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.component';
-import { NoDataFoundComponent } from '../../ui/no-data-found.component';
 
 @Component({
   selector: 'app-note-list',

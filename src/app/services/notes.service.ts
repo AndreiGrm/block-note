@@ -15,7 +15,7 @@ export class NotesService {
   updateStatus = signal<'none' | 'loading' | 'saved' | 'error'>('none');
 
   load() {
-    const response = this.localstorage.load('notes')
+    const response = this.localstorage.load<Note>('notes')
     if (response.status !== 200) {
       this.notes.set([]);
       return;
@@ -23,13 +23,13 @@ export class NotesService {
     
     let notes: Note[] = response.data;
 
-    if (Array.isArray(notes)) {
+
       this.notes.set(notes);
       
       if (!this.notes().length) {
         this.addNotes()
       }
-    }
+
     this.selectNote(null);
   }
 
@@ -37,7 +37,7 @@ export class NotesService {
     if (this.selected()?.isLocked) {
        this.ghostUpdate({canSee: false})
     }
-    this.selected.set(this.localstorage.getById('notes', 'selected-note', id).data)
+    this.selected.set(this.localstorage.getById<Note>('notes', 'selected-note', id).data)
   }
 
   ghostUpdate(value: Partial<Note>) {
@@ -47,7 +47,7 @@ export class NotesService {
       ...selectedNote,
       ...value,
     };
-    const response = this.localstorage.update('notes', updatedNote, true)
+    const response = this.localstorage.update<Note>('notes', updatedNote, true)
     if (response.status !== 200) {
       return;
     }
@@ -81,7 +81,7 @@ export class NotesService {
   }
 
   search (element: any) {
-    const filteredNotes = this.localstorage.getBy('notes', 'title', element.value).data
+    const filteredNotes = this.localstorage.getBy<Note>('notes', 'title', element.value).data
     this.notes.set(filteredNotes)
   }
 
@@ -97,7 +97,7 @@ export class NotesService {
     // this is just for fake the time to update 
     this.updateStatus.set('loading');
     setTimeout(() => {
-      const response = this.localstorage.update('notes', updatedNote, silentUpdate)
+      const response = this.localstorage.update<Note>('notes', updatedNote, silentUpdate)
       if (response.status !== 200) {
         this.updateStatus.set('error');
         return;
@@ -116,7 +116,7 @@ export class NotesService {
   }
 
   updateAllNote (note: Note) {
-    const newValue = this.localstorage.update('notes', note).data
+    const newValue = this.localstorage.update<Note>('notes', note).data
 
     this.notes.update(notes =>
       notes.map(note => note.id === newValue.id ? newValue : note)
@@ -125,7 +125,7 @@ export class NotesService {
   }
 
   deleteNote(noteToRemove: Note) {
-    this.localstorage.delete('notes', noteToRemove.id)
+    this.localstorage.delete<Note>('notes', noteToRemove.id)
     this.notes.update(notes => notes.filter(note => note.id !== noteToRemove.id));
     this.selectNote(null);
   }

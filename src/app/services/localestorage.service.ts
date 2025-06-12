@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api';
 export class LocalestorageService {
 
   messageService = inject(MessageService)
-  load (param: string): Response {
+  load <T>(param: string): ResponseDue<T[]> | ResponseError {
     try {
       let notesJson = localStorage.getItem(param);
       if (!notesJson) {
@@ -25,13 +25,13 @@ export class LocalestorageService {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error while loading record' });
       return {
         status: 404,
-        data: []
+        message: 'Error while loading record'
       }
     }
     
   }
 
-  save<K, T>(param: string, newValue: T): Response {
+  save<K, T>(param: string, newValue: T): Response | ResponseError {
     try {
       const elements = this.load(param).data
       elements.push(newValue)
@@ -46,18 +46,21 @@ export class LocalestorageService {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error while adding record' });
       return {
         status: 404,
-        data: null
+        message: 'Error while adding record'
       }
     }
   }
 
-  update<T extends { id: number }>(param: string, updatedValue: T, silentUpdate: boolean = false): Response {
+  update<T extends { id: number }>(param: string, updatedValue: T, silentUpdate: boolean = false): ResponseDue<T> | ResponseError {
     try {
-      const elements = this.load(param).data
-      if (Array.isArray(elements)) {
-        const updatedElements = elements.map(el => el.id === updatedValue.id ? updatedValue : el)
-        localStorage.setItem(param, JSON.stringify(updatedElements));
-      }
+      const response = this.load<T>(param)
+      if (response as  ResponseError) throw new Error();
+
+        const elements = response.data
+      const updatedElements = elements.map(el => el.id === updatedValue.id ? updatedValue : el)
+      localStorage.setItem(param, JSON.stringify(updatedElements));
+
+
       if (!silentUpdate){
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record sucesfully updated' });
       }
@@ -70,14 +73,14 @@ export class LocalestorageService {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error while updating record' });
       return {
         status: 404,
-        data: null
+        message: 'Error while updating record'
       }
     }
   }
 
-  delete (param: string, id: number): Response {
+  delete <T extends { id: number }>(param: string, id: number): ResponseDue<null> | ResponseError {
     try {
-      const elements = this.load(param).data
+      const elements = this.load<T>(param).data
 
       if (Array.isArray(elements)) {
         localStorage.setItem(param, JSON.stringify(elements.filter(el => el.id !== id)));
@@ -91,52 +94,48 @@ export class LocalestorageService {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error while deleting record' });
       return {
         status: 404,
-        data: null
+         message: 'Error while deleting record'
       }
     }
   }
 
-  getById (from:string, param: string, id: number | null): Response {
+  getById <T extends { id: number }>(from:string, param: string, id: number | null): ResponseDue<T> {
     try {
-      const elements = this.load(from).data
+      const elements = this.load<T>(from).data
       if (!id) {
         const lastSelected = localStorage.getItem(param);
-        if (lastSelected && lastSelected!== '' && this.isValidId(from, Number(lastSelected))) {
+        if (lastSelected && lastSelected!== '' && this.isValidId<T>(from, Number(lastSelected))) {
           localStorage.setItem(param, lastSelected);
         } else {
           localStorage.setItem(param, '');
         }
       } else {
-        if (this.isValidId(from, id)) {
+        if (this.isValidId<T>(from, id)) {
           localStorage.setItem(param, id.toString());
         } else {
           localStorage.setItem(param, '');
         }
       }
       
-      if (Array.isArray(elements)) {
-        return {
-          status: 200,
-          data: elements.find(el => el.id === Number(localStorage.getItem(param)))
-        }
-      }
+
       return {
-          status: 200,
-          data: null
-        }
+        status: 200,
+        data: elements.find(el => el.id === Number(localStorage.getItem(param)))
+      }
+
     } catch (error) {
       console.error("Error:", error);
       return {
         status: 404,
-        data: null
+        data: 
       }
     }
     
   }
 
-  isValidId (from: string, id: number) {
+  isValidId <T>(from: string, id: number) {
       if (!id) return false
-      const response: Response = this.load(from)
+      const response: Response = this.load<T>(from)
       if (Array.isArray(response.data)) {
         const valid = response.data.find(r => r.id === id);
         if (valid && valid.id) {
@@ -150,30 +149,40 @@ export class LocalestorageService {
 
   }
 
-  getBy (from: string, param: string, value: string): Response {
-    try {
-      const elements = this.load(from).data
-      let results = []
-      if (Array.isArray(elements)) {
-        results = elements.filter(el =>
-          typeof el[param] === 'string' && el[param].toLowerCase().includes(value.toLowerCase())
-        );
-      }
-      return {
-        status: 200,
-        data: results
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      return {
-        status: 404,
-        data: []
-      }
-    }
-  }
+  // getBy (from: string, param: string, value: string): Response {
+  //   try {
+  //     const elements = this.load(from).data
+  //     let results = []
+  //     if (Array.isArray(elements)) {
+  //       results = elements.filter(el =>
+  //         typeof el[param] === 'string' && el[param].toLowerCase().includes(value.toLowerCase())
+  //       );
+  //     }
+  //     return {
+  //       status: 200,
+  //       data: results
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     return {
+  //       status: 404,
+  //       data: []
+  //     }
+  //   }
+  // }
 }
 
 type Response = {
   status: number,
   data: any
+}
+
+type ResponseDue<T> = {
+  status: number,
+  data: T
+}
+
+type ResponseError = {
+  status: number,
+  message: string 
 }

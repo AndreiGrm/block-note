@@ -33,7 +33,14 @@ export class LocalestorageService {
 
   save<K, T>(param: string, newValue: T): Response | ResponseError {
     try {
-      const elements = this.load(param).data
+      const response = this.load<T>(param);
+
+      if (this.isResponseError(response)) {
+        throw new Error();
+      }
+
+      const elements = response.data;
+
       elements.push(newValue)
       localStorage.setItem(param, JSON.stringify(elements));
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record added' });
@@ -53,10 +60,15 @@ export class LocalestorageService {
 
   update<T extends { id: number }>(param: string, updatedValue: T, silentUpdate: boolean = false): ResponseDue<T> | ResponseError {
     try {
-      const response = this.load<T>(param)
-      if (response as  ResponseError) throw new Error();
+      const response = this.load<T>(param);
 
-        const elements = response.data
+      if (this.isResponseError(response)) {
+        throw new Error();
+      }
+
+      const elements = response.data;
+
+
       const updatedElements = elements.map(el => el.id === updatedValue.id ? updatedValue : el)
       localStorage.setItem(param, JSON.stringify(updatedElements));
 
@@ -80,7 +92,14 @@ export class LocalestorageService {
 
   delete <T extends { id: number }>(param: string, id: number): ResponseDue<null> | ResponseError {
     try {
-      const elements = this.load<T>(param).data
+      const response = this.load<T>(param);
+
+      if (this.isResponseError(response)) {
+        throw new Error();
+      }
+
+      const elements = response.data;
+
 
       if (Array.isArray(elements)) {
         localStorage.setItem(param, JSON.stringify(elements.filter(el => el.id !== id)));
@@ -99,9 +118,16 @@ export class LocalestorageService {
     }
   }
 
-  getById <T extends { id: number }>(from:string, param: string, id: number | null): ResponseDue<T> {
+  getById <T extends { id: number }>(from:string, param: string, id: number | null): ResponseDue<T> | ResponseError{
     try {
-      const elements = this.load<T>(from).data
+      const response = this.load<T>(param);
+
+      if (this.isResponseError(response)) {
+        throw new Error();
+      }
+
+      const elements = response.data;
+
       if (!id) {
         const lastSelected = localStorage.getItem(param);
         if (lastSelected && lastSelected!== '' && this.isValidId<T>(from, Number(lastSelected))) {
@@ -116,28 +142,40 @@ export class LocalestorageService {
           localStorage.setItem(param, '');
         }
       }
-      
+      const element = elements.find(el => el.id === Number(localStorage.getItem(param)))
+      if (element === undefined)  throw new Error();
 
       return {
         status: 200,
-        data: elements.find(el => el.id === Number(localStorage.getItem(param)))
+        data: element
       }
 
     } catch (error) {
       console.error("Error:", error);
       return {
         status: 404,
-        data: 
+        message: 'Error while loading record'
       }
     }
     
   }
 
-  isValidId <T>(from: string, id: number) {
+  isResponseError(obj: any): obj is ResponseError {
+    return obj && typeof obj.error === 'string';
+  }
+
+  isValidId <T extends { id: number }>(from: string, id: number) {
       if (!id) return false
-      const response: Response = this.load<T>(from)
+      const response = this.load<T>(from);
+
+      if (this.isResponseError(response)) {
+        throw new Error();
+      }
+
+      const elements = response.data;
+
       if (Array.isArray(response.data)) {
-        const valid = response.data.find(r => r.id === id);
+        const valid = elements.find(r => r.id === id);
         if (valid && valid.id) {
           return true
         } else {
@@ -149,27 +187,33 @@ export class LocalestorageService {
 
   }
 
-  // getBy (from: string, param: string, value: string): Response {
-  //   try {
-  //     const elements = this.load(from).data
-  //     let results = []
-  //     if (Array.isArray(elements)) {
-  //       results = elements.filter(el =>
-  //         typeof el[param] === 'string' && el[param].toLowerCase().includes(value.toLowerCase())
-  //       );
-  //     }
-  //     return {
-  //       status: 200,
-  //       data: results
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     return {
-  //       status: 404,
-  //       data: []
-  //     }
-  //   }
-  // }
+  getBy <T  extends Record<string, any>>(from: string, param: string, value: string): ResponseDue<T[]> | ResponseError {
+    try {
+      const response = this.load<T>(from);
+
+      if (this.isResponseError(response)) {
+        throw new Error();
+      }
+
+      const elements = response.data;
+
+
+      const results = elements.filter(el =>
+        typeof el[param] === 'string' && el[param].toLowerCase().includes(value.toLowerCase())
+      );
+
+      return {
+        status: 200,
+        data: results
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return {
+        status: 404,
+        message: 'Error while loading record'
+      }
+    }
+  }
 }
 
 type Response = {

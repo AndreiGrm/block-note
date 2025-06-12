@@ -9,9 +9,7 @@ import { NotesService } from '../../services/notes.service';
 import { DatePipe } from '@angular/common';
 import { LockDialogComponent } from '../lock-dialog.component';
 import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.component';
-
-
-
+import { NoDataFoundComponent } from '../../ui/no-data-found.component';
 
 @Component({
   selector: 'app-note-list',
@@ -24,7 +22,8 @@ import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.compon
     InputTextModule,
     DatePipe,
     LockDialogComponent,
-    DeleteConfirmationComponent
+    DeleteConfirmationComponent,
+    NoDataFoundComponent
 ],
   template: `
         <div class="w-full mb-6">
@@ -40,45 +39,49 @@ import { DeleteConfirmationComponent } from '../../ui/delete-confirmation.compon
             (keyup)="notesService.search($event.target)"
             pSize="large"/>
         </div>
-        @for (note of notesService.notes(); track note.id) {
-          <div class="mb-6">
-            <p-card
-              (click)="notesService.selectNote(note.id)"
-              [style]="{
-                'background-color': '#121212',
-                'color': '#ffffff',
-                'border' : notesService.selected()?.id === note.id ? 'solid 1px #34d399' : ''
-                }">
-              <div class="flex items-center">
-                  <div class="m-0 flex-5 truncate">
-                      <p class="truncate">
-                      {{ note.title}}
-                      </p>
-                      <span class="text-gray-500 italic" >{{ note.lastModified | date: 'dd/MM/yy HH:mm' }}</span>
-                  </div>
-  
-                  <div class="flex-1 flex gap-1 ">
-                    @if (!note.isLocked) {
+        @if (notesService.notes().length === 0) {
+          <app-no-data-found></app-no-data-found>
+        } @else {
+          @for (note of notesService.notes(); track note.id) {
+            <div class="mb-6">
+              <p-card
+                (click)="notesService.selectNote(note.id)"
+                [style]="{
+                  'background-color': '#121212',
+                  'color': '#ffffff',
+                  'border' : notesService.selected()?.id === note.id ? 'solid 1px #34d399' : ''
+                  }">
+                <div class="flex items-center">
+                    <div class="m-0 flex-5 truncate">
+                        <p class="truncate">
+                        {{ note.title}}
+                        </p>
+                        <span class="text-gray-500 italic" >{{ note.lastModified | date: 'dd/MM/yy HH:mm' }}</span>
+                    </div>
+    
+                    <div class="flex-1 flex gap-1 ">
+                      @if (!note.isLocked) {
+                        <p-button
+                          severity="danger"
+                          (click)="deleteDialog = true"
+                          title="Elimina"
+                        >
+                          <i class="pi pi-trash" title="Elimina"></i>
+                        </p-button>
+                      }
                       <p-button
-                        severity="danger"
-                        (click)="deleteDialog = true"
-                        title="Elimina"
+                        severity="info"
+                        (click)="visible = true"
+                        title="Blocca/Sblocca"
                       >
-                        <i class="pi pi-trash" title="Elimina"></i>
+                        <i class="pi pi-cog" ></i>
                       </p-button>
-                    }
-                    <p-button
-                      severity="info"
-                      (click)="visible = true"
-                      title="Blocca/Sblocca"
-                    >
-                      <i class="pi pi-cog" ></i>
-                    </p-button>
+                    </div>
                   </div>
-                </div>
-            </p-card>
-          </div>
-        }
+              </p-card>
+            </div>
+          }
+         }
         <app-lock-dialog [(visible)]="visible" />
         <app-delete-confirmation [(visible)]="deleteDialog" />
   `,

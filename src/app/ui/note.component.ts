@@ -3,6 +3,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { NotesService } from '../services/notes.service';
+import { DeselectBadgeComponent } from './deselect-badge.component';
+import { NoteLockedComponent } from './note-locked.component';
+import { NoNoteSelectedComponent } from './no-note-selected.component';
 
 @Component({
   selector: 'app-note',
@@ -10,13 +13,14 @@ import { NotesService } from '../services/notes.service';
   imports: [
     InputTextModule,
     TextareaModule,
-    FormsModule
+    FormsModule,
+    DeselectBadgeComponent,
+    NoteLockedComponent,
+  NoNoteSelectedComponent
   ],
   template: `
     @if (!notesService.selected()) {
-      <div class="flex justify-center items-center h-full">
-        <div class="text-2xl text-gray-500">No note selected</div>
-      </div>
+      <app-no-note-selected></app-no-note-selected>
     }
     @else if (notesService.selected()?.canSee) {
       <div style="color: white;" class="flex flex-col gap-4">
@@ -60,8 +64,11 @@ import { NotesService } from '../services/notes.service';
           <span class="text-gray-500 self-end-safe">{{ content.length }}/2000 characters</span>
         </div>
       </div>
+      <app-deselect-badge></app-deselect-badge>
     } @else {
-      <div>Note is locked</div>
+      <app-note-locked class="flex inset-0 flex items-center justify-center pointer-events-none"></app-note-locked>
+      
+      <app-deselect-badge></app-deselect-badge>
     }
   `,
   styles: []

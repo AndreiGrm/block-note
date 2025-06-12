@@ -6,5 +6,5 @@ export interface Note {
   lastModified: Date;
   isLocked: boolean;
   canSee: boolean
-  passward: number | undefined;
+  password: number | undefined;
 }

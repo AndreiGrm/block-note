@@ -70,7 +70,7 @@ export class NotesService {
       creationDate: now,
       isLocked: false,
       canSee: true,
-      passward: undefined
+      password: undefined
     };
 
     const newValue = this.localstorage.save('notes', newNote).data

@@ -98,7 +98,7 @@ export class LockDialogComponent {
         if (this.pin && selected) {
           newNote = {
             ...selected,
-            passward: this.pin,
+            password: this.pin,
             isLocked: true
           }
           this.notesService.updateAllNote(newNote)
@@ -108,7 +108,7 @@ export class LockDialogComponent {
         if(this.haveAuth() && selected) {
           newNote = {
             ...selected,
-            passward: undefined,
+            password: undefined,
             isLocked: false,
             canSee: true
           }
@@ -140,7 +140,7 @@ export class LockDialogComponent {
   }
 
   haveAuth () {
-    return this.pin === this.notesService.selected()?.passward
+    return this.pin === this.notesService.selected()?.password
   }
 
 }

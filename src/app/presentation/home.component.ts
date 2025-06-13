@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Note } from '../ui/note.component';
+import { Note } from '../features/note.component';
 import { NoteList } from '../features/note-list.component';
 
 @Component({

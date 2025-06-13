@@ -3,9 +3,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { NotesService } from '../services/notes.service';
-import { DeselectBadgeComponent } from './deselect-badge.component';
-import { NoteLockedComponent } from './note-locked.component';
-import { NoNoteSelectedComponent } from './no-note-selected.component';
+import { DeselectBadgeComponent } from '../ui/deselect-badge.component';
+import { NoteLockedComponent } from '../ui/note-locked.component';
+import { NoNoteSelectedComponent } from '../ui/no-note-selected.component';
 
 @Component({
   selector: 'app-note',

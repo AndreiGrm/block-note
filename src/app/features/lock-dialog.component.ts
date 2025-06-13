@@ -67,13 +67,14 @@ import { NotesService } from '../services/notes.service';
           icon="pi pi-eye"
           (click)="lockEvent('show')"
         />
-
-        <p-button
-          severity="danger"
-          label="Delete"
-          icon="pi pi-trash"
-          (click)="lockEvent('delete')"
-        />
+        @if (!notesService.selected()?.isLocked) {
+          <p-button
+            severity="danger"
+            label="Delete"
+            icon="pi pi-trash"
+            (click)="lockEvent('delete')"
+          />
+        }
       </div>
     </p-dialog>`,
   styles: []

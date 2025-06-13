@@ -67,7 +67,7 @@ import { NotesService } from '../services/notes.service';
           icon="pi pi-eye"
           (click)="lockEvent('show')"
         />
-        @if (!notesService.selected()?.isLocked) {
+        @if (notesService.selected()?.isLocked) {
           <p-button
             severity="danger"
             label="Delete"

@@ -16,7 +16,7 @@ export class NotesService {
 
   load() {
     const response = this.localstorage.load<Note>('notes')
-    if (response.status !== 200) {
+    if (response.status !== 200 || !('data' in response)) {
       this.notes.set([]);
       return;
     }
@@ -37,7 +37,13 @@ export class NotesService {
     if (this.selected()?.isLocked) {
        this.ghostUpdate({canSee: false})
     }
-    this.selected.set(this.localstorage.getById<Note>('notes', 'selected-note', id).data)
+    const response = this.localstorage.getById<Note>('notes', 'selected-note', id)
+
+    if (response.status !== 200 || !('data' in response)) {
+      return;
+    }
+
+    this.selected.set(response.data)
   }
 
   ghostUpdate(value: Partial<Note>) {
@@ -48,7 +54,7 @@ export class NotesService {
       ...value,
     };
     const response = this.localstorage.update<Note>('notes', updatedNote, true)
-    if (response.status !== 200) {
+    if (response.status !== 200 || !('data' in response)) {
       return;
     }
 
@@ -73,7 +79,14 @@ export class NotesService {
       password: undefined
     };
 
-    const newValue = this.localstorage.save('notes', newNote).data
+    const response = this.localstorage.save<Note>('notes', newNote)
+
+    if (response.status !== 200 || !('data' in response)) {
+      return;
+    }
+
+    const newValue = response.data
+
     if (newValue) {
       this.notes.update(notes => [...notes, newValue]);
       this.selectNote(newValue.id);
@@ -81,7 +94,15 @@ export class NotesService {
   }
 
   search (element: any) {
-    const filteredNotes = this.localstorage.getBy<Note>('notes', 'title', element.value).data
+
+    const response = this.localstorage.getBy<Note>('notes', 'title', element.value)
+
+    if (response.status !== 200 || !('data' in response)) {
+      return;
+    }
+
+    const filteredNotes = response.data
+
     this.notes.set(filteredNotes)
   }
 
@@ -98,7 +119,7 @@ export class NotesService {
     this.updateStatus.set('loading');
     setTimeout(() => {
       const response = this.localstorage.update<Note>('notes', updatedNote, silentUpdate)
-      if (response.status !== 200) {
+      if (response.status !== 200 || !('data' in response)) {
         this.updateStatus.set('error');
         return;
       }
@@ -116,7 +137,14 @@ export class NotesService {
   }
 
   updateAllNote (note: Note) {
-    const newValue = this.localstorage.update<Note>('notes', note).data
+    const response = this.localstorage.update<Note>('notes', note)
+
+    if (response.status !== 200 || !('data' in response)) {
+      this.updateStatus.set('error');
+      return;
+    }
+
+    const newValue = response.data
 
     this.notes.update(notes =>
       notes.map(note => note.id === newValue.id ? newValue : note)
@@ -125,7 +153,12 @@ export class NotesService {
   }
 
   deleteNote(noteToRemove: Note) {
-    this.localstorage.delete<Note>('notes', noteToRemove.id)
+    const response = this.localstorage.delete<Note>('notes', noteToRemove.id)
+
+    if (response.status !== 200 || !('data' in response)) {
+      return;
+    }
+
     this.notes.update(notes => notes.filter(note => note.id !== noteToRemove.id));
     this.selectNote(null);
   }

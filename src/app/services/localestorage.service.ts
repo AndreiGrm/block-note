@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api';
 export class LocalestorageService {
 
   messageService = inject(MessageService)
-  load <T>(param: string): ResponseDue<T[]> | ResponseError {
+  load <T>(param: string): Response<T[]> | ResponseError {
     try {
       let notesJson = localStorage.getItem(param);
       if (!notesJson) {
@@ -16,7 +16,8 @@ export class LocalestorageService {
           data: []
         }
       }
-      const notesParsed = JSON.parse(notesJson);
+      const notesParsed: T[] = JSON.parse(notesJson);
+      
        return {
         status: 200,
         data: notesParsed
@@ -31,7 +32,7 @@ export class LocalestorageService {
     
   }
 
-  save<K, T>(param: string, newValue: T): Response | ResponseError {
+  save<T>(param: string, newValue: T): Response<T> | ResponseError {
     try {
       const response = this.load<T>(param);
 
@@ -58,7 +59,7 @@ export class LocalestorageService {
     }
   }
 
-  update<T extends { id: number }>(param: string, updatedValue: T, silentUpdate: boolean = false): ResponseDue<T> | ResponseError {
+  update<T extends { id: number }>(param: string, updatedValue: T, silentUpdate: boolean = false): Response<T> | ResponseError {
     try {
       const response = this.load<T>(param);
 
@@ -90,7 +91,7 @@ export class LocalestorageService {
     }
   }
 
-  delete <T extends { id: number }>(param: string, id: number): ResponseDue<null> | ResponseError {
+  delete <T extends { id: number }>(param: string, id: number): Response<null> | ResponseError {
     try {
       const response = this.load<T>(param);
 
@@ -118,16 +119,16 @@ export class LocalestorageService {
     }
   }
 
-  getById <T extends { id: number }>(from:string, param: string, id: number | null): ResponseDue<T> | ResponseError{
+  getById <T extends { id: number }>(from:string, param: string, id: number | null): Response<T | undefined> | ResponseError{
     try {
-      const response = this.load<T>(param);
+      const response = this.load<T>(from);
 
       if (this.isResponseError(response)) {
         throw new Error();
       }
-
+      
       const elements = response.data;
-
+      
       if (!id) {
         const lastSelected = localStorage.getItem(param);
         if (lastSelected && lastSelected!== '' && this.isValidId<T>(from, Number(lastSelected))) {
@@ -143,7 +144,7 @@ export class LocalestorageService {
         }
       }
       const element = elements.find(el => el.id === Number(localStorage.getItem(param)))
-      if (element === undefined)  throw new Error();
+
 
       return {
         status: 200,
@@ -187,7 +188,7 @@ export class LocalestorageService {
 
   }
 
-  getBy <T  extends Record<string, any>>(from: string, param: string, value: string): ResponseDue<T[]> | ResponseError {
+  getBy <T  extends Record<string, any>>(from: string, param: string, value: string): Response<T[]> | ResponseError {
     try {
       const response = this.load<T>(from);
 
@@ -216,12 +217,7 @@ export class LocalestorageService {
   }
 }
 
-type Response = {
-  status: number,
-  data: any
-}
-
-type ResponseDue<T> = {
+type Response<T> = {
   status: number,
   data: T
 }

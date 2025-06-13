@@ -43,7 +43,9 @@ export class LocalestorageService {
       const elements = response.data;
 
       elements.push(newValue)
+
       localStorage.setItem(param, JSON.stringify(elements));
+
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record added' });
       return {
         status: 200,
@@ -71,6 +73,7 @@ export class LocalestorageService {
 
 
       const updatedElements = elements.map(el => el.id === updatedValue.id ? updatedValue : el)
+
       localStorage.setItem(param, JSON.stringify(updatedElements));
 
 
@@ -101,10 +104,8 @@ export class LocalestorageService {
 
       const elements = response.data;
 
+      localStorage.setItem(param, JSON.stringify(elements.filter(el => el.id !== id)));
 
-      if (Array.isArray(elements)) {
-        localStorage.setItem(param, JSON.stringify(elements.filter(el => el.id !== id)));
-      }
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record sucesfully deleted' });
       return {
         status: 200,
@@ -161,9 +162,6 @@ export class LocalestorageService {
     
   }
 
-  isResponseError(obj: any): obj is ResponseError {
-    return obj && typeof obj.error === 'string';
-  }
 
   isValidId <T extends { id: number }>(from: string, id: number) {
       if (!id) return false
@@ -175,17 +173,13 @@ export class LocalestorageService {
 
       const elements = response.data;
 
-      if (Array.isArray(response.data)) {
-        const valid = elements.find(r => r.id === id);
-        if (valid && valid.id) {
-          return true
-        } else {
-          return false
-        }
+      const valid = elements.find(r => r.id === id);
+
+      if (valid && valid.id) {
+        return true
       } else {
         return false
       }
-
   }
 
   getBy <T  extends Record<string, any>>(from: string, param: string, value: string): Response<T[]> | ResponseError {
@@ -215,6 +209,11 @@ export class LocalestorageService {
       }
     }
   }
+
+  isResponseError(obj: any): obj is ResponseError {
+    return obj && typeof obj.error === 'string';
+  }
+
 }
 
 type Response<T> = {

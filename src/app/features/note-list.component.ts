@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { NoDataFoundComponent } from '../ui/no-data-found.component';
 import { DeleteConfirmationComponent } from '../ui/delete-confirmation.component';
 import { LockDialogComponent } from './lock-dialog.component';
@@ -10,6 +10,8 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { NotesService } from '../services/notes.service';
 import { DatePipe } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-note-list',
@@ -23,7 +25,8 @@ import { DatePipe } from '@angular/common';
     DatePipe,
     LockDialogComponent,
     DeleteConfirmationComponent,
-    NoDataFoundComponent
+    NoDataFoundComponent,
+    ReactiveFormsModule
 ],
   template: `
         <div class="w-full mb-6">
@@ -31,12 +34,12 @@ import { DatePipe } from '@angular/common';
         </div>
         <div class="card flex justify-center mb-6">
           <input
+            [formControl]="searchInput"
             type="text"
             pInputText
             placeholder="Search..."
             fluid
             variant="filled"
-            (keyup)="notesService.search($event.target)"
             pSize="large"/>
         </div>
         @if (notesService.notes().length === 0) {
@@ -94,6 +97,9 @@ import { DatePipe } from '@angular/common';
   `
 })
 export class NoteList implements OnInit {
+
+  searchInput = new FormControl('');
+
   visible: boolean = false;
 
   notesService = inject(NotesService)
@@ -101,10 +107,22 @@ export class NoteList implements OnInit {
   deleteDialog: boolean = false;
   
   ngOnInit(): void {
-     this.notesService.load()
+    this.notesService.load()
   }
 
-
+  constructor() {
+    this.searchInput.valueChanges
+      .pipe(
+        debounceTime(1000),
+        distinctUntilChanged()
+      )
+      .subscribe((text) => {
+        if(text) {
+          this.notesService.search(text)
+        }
+      });;
+  }
+  
   deleteNote () {
     const note = this.notesService.selected()
     if (note){

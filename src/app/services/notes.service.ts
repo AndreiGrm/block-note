@@ -93,9 +93,9 @@ export class NotesService {
     }
   }
 
-  search (element: any) {
+  search (element: string) {
 
-    const response = this.localstorage.getBy<Note>('notes', 'title', element.value)
+    const response = this.localstorage.getBy<Note>('notes', 'title', element)
 
     if (response.status !== 200 || !('data' in response)) {
       return;

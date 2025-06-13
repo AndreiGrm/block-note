@@ -71,7 +71,7 @@ export class NotesService {
     const newNote: Note = {
       id: now.getTime(),
       title: 'New note',
-      content: 'Write...',
+      content: '',
       lastModified: now,
       creationDate: now,
       isLocked: false,

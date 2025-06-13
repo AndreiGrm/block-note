@@ -55,6 +55,7 @@ import { NoNoteSelectedComponent } from '../ui/no-note-selected.component';
           <strong>Content:</strong>
           <textarea
             rows="5"
+            placeholder="Write your note here..."
             cols="30"
             pTextarea
             [(ngModel)]="content"

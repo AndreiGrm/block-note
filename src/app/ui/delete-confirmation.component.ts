@@ -1,10 +1,9 @@
-import { Component, EventEmitter, inject, input, Input, model, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, Input, model, output, Output } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { NotesService } from '../services/notes.service';
 
 @Component({
   selector: 'app-delete-confirmation',
@@ -24,25 +23,22 @@ import { NotesService } from '../services/notes.service';
       <div class="flex justify-end gap-2">
         <p-button label="Cancel" severity="secondary" (click)="toggleDialog()" />
 
-        <p-button severity="danger" label="Confirm" (click)="onDelete()" />
+        <p-button severity="danger"  label="Confirm" (click)="onDelete()" />
       </div>
     </p-dialog>
   `,
   styles: []
 })
 export class DeleteConfirmationComponent {
-  notesService = inject(NotesService);
   visible = model<boolean>(false);
+  delete = output<void>();
 
   toggleDialog () {
     this.visible.set(!this.visible());
   }
 
   onDelete () {
-    const note = this.notesService.selected()
-    if (note){
-      this.notesService.deleteNote(note)
-    }
+    this.delete.emit()
     this.toggleDialog()
   }
 

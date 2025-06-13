@@ -83,7 +83,11 @@ import { DatePipe } from '@angular/common';
           }
          }
         <app-lock-dialog [(visible)]="visible" />
-        <app-delete-confirmation [(visible)]="deleteDialog" />
+
+        <app-delete-confirmation
+          [(visible)]="deleteDialog"
+          (delete)="deleteNote()"
+        />
   `,
   styles: `
 
@@ -91,9 +95,21 @@ import { DatePipe } from '@angular/common';
 })
 export class NoteList implements OnInit {
   visible: boolean = false;
-  deleteDialog: boolean = false;
+
   notesService = inject(NotesService)
+
+  deleteDialog: boolean = false;
+  
   ngOnInit(): void {
      this.notesService.load()
+  }
+
+
+  deleteNote () {
+    const note = this.notesService.selected()
+    if (note){
+      this.notesService.deleteNote(note)
+    }
+    this.deleteDialog = false;
   }
 }

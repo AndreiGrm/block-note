@@ -126,6 +126,7 @@ export class LockDialogComponent {
         break;
       case 'delete':
         if (this.haveAuth() && selected) {
+          this.toggleDialog()
           this.notesService.deleteNote(selected);
         }
         break;

@@ -54,20 +54,19 @@ import { NotesService } from '../services/notes.service';
             icon="pi pi-lock"
             (click)="lockEvent('lock')"
           />
-        }
-
-        <p-button
-          label="Unlock"
-          icon="pi pi-lock-open"
-          (click)="lockEvent('unlock')"
-        />
-
-        <p-button
-          label="Show"
-          icon="pi pi-eye"
-          (click)="lockEvent('show')"
-        />
-        @if (notesService.selected()?.isLocked) {
+          }
+          @if (notesService.selected()?.isLocked) {
+            <p-button
+              label="Unlock"
+              icon="pi pi-lock-open"
+              (click)="lockEvent('unlock')"
+            />
+    
+            <p-button
+              label="Show"
+              icon="pi pi-eye"
+              (click)="lockEvent('show')"
+            />
           <p-button
             severity="danger"
             label="Delete"

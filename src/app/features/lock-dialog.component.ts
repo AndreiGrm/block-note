@@ -1,10 +1,11 @@
 import { Component, EventEmitter, inject, input, Input, model, Output } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, Validators } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { NotesService } from '../services/notes.service';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-lock-dialog',
@@ -14,7 +15,8 @@ import { NotesService } from '../services/notes.service';
     TextareaModule,
     ButtonModule,
     DialogModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   template: `
     <p-dialog
@@ -28,7 +30,7 @@ import { NotesService } from '../services/notes.service';
         <div class="field">
           <label for="pin" class="font-semibold mb-2 block text-sm text-gray-700">PIN</label>
           <input
-            [(ngModel)]="pin"
+            [formControl]="pin"
             type="number"
             pInputText
             id="pin"
@@ -80,13 +82,15 @@ import { NotesService } from '../services/notes.service';
 })
 export class LockDialogComponent {
   notesService = inject(NotesService);
-  pin: number | undefined
+
+  pin = new FormControl<number>(0, { nonNullable: true });
 
 
   visible = model<boolean>(false);
 
 
   toggleDialog () {
+    this.pin.setValue(0)
     this.visible.set(!this.visible());
   }
 
@@ -98,7 +102,7 @@ export class LockDialogComponent {
         if (this.pin && selected) {
           newNote = {
             ...selected,
-            password: this.pin,
+            password: this.pin.value,
             isLocked: true
           }
           this.notesService.updateAllNote(newNote)
@@ -137,11 +141,11 @@ export class LockDialogComponent {
     if (this.haveAuth()) {
       this.toggleDialog()
     }
-    this.pin = undefined
+    this.pin.setValue(0)
   }
 
   haveAuth () {
-    return this.pin === this.notesService.selected()?.password
+    return this.pin.value === this.notesService.selected()?.password
   }
 
 }
